@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taskly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --cream: #FAF7F2;
+            --warm-white: #FFFDF9;
+            --ink: #1A1612;
+            --ink-muted: #6B6460;
+            --ink-faint: #C4BDB8;
+            --accent: #C8502A;
+            --accent-light: #F5E8E3;
+            --amber: #D4922A;
+            --amber-light: #FBF3E2;
+            --sage: #4A7C59;
+            --sage-light: #E8F2EC;
+            --border: rgba(26, 22, 18, 0.09);
+            --shadow: 0 2px 4px rgba(26, 22, 18, 0.04), 0 12px 40px rgba(26, 22, 18, 0.10);
+            --shadow-hover: 0 4px 8px rgba(26, 22, 18, 0.06), 0 24px 64px rgba(26, 22, 18, 0.18);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--cream);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background-image:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(200, 80, 42, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 60% at 80% 90%, rgba(212, 146, 42, 0.06) 0%, transparent 60%);
+        }
+
+        /* ── CARD ── */
+        .card-wrapper {
+            max-width: 460px;
+            width: 100%;
+            perspective: 1000px;
+        }
+
+        .card {
+            background: var(--warm-white);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s ease;
+            animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @media (hover: hover) {
+            .card:hover {
+                transform: translateY(-6px) rotate(-0.3deg);
+                box-shadow: var(--shadow-hover);
+            }
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(28px) scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .card.completed .task-title,
+        .card.completed .task-desc {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        /* ── HEADER BAND ── */
+        .card-band {
+            height: 5px;
+            width: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--amber) 100%);
+        }
+
+        /* ── BODY ── */
+        .card-body {
+            padding: 1.5rem 1.5rem 1.25rem;
+        }
+
+        @media (min-width: 480px) {
+            .card-body {
+                padding: 2rem 2rem 1.5rem;
+            }
+        }
+
+        /* ── TOP ROW ── */
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .left-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .checkbox-wrap {
+            margin-top: 3px;
+            flex-shrink: 0;
+            position: relative;
+            width: 22px;
+            height: 22px;
+        }
+
+        .checkbox-wrap input[type="checkbox"] {
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 1.5px solid var(--ink-faint);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+        }
+
+        .checkbox-wrap input[type="checkbox"]:checked {
+            background: var(--sage);
+            border-color: var(--sage);
+        }
+
+        .checkbox-wrap input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 12px;
+            height: 7px;
+            border-left: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(-45deg);
+        }
+
+        .title-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.0rem, 4vw, 1.30rem);
+            font-weight: 700;
+            color: var(--ink);
+            padding-bottom: 6px;
+            line-height: 1.25;
+            letter-spacing: -0.01em;
+            word-break: break-word;
+        }
+
+        .priority-pill {
+            flex-shrink: 0;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 0.35rem 0.75rem;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 3px;
+            white-space: nowrap;
+        }
+
+        .priority-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .prio-high {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .prio-high .priority-dot {
+            background: var(--accent);
+            animation: throb 1.4s ease-in-out infinite;
+        }
+
+        .prio-medium {
+            background: var(--amber-light);
+            color: var(--amber);
+        }
+
+        .prio-medium .priority-dot {
+            background: var(--amber);
+        }
+
+        .prio-low {
+            background: var(--sage-light);
+            color: var(--sage);
+        }
+
+        .prio-low .priority-dot {
+            background: var(--sage);
+        }
+
+        @keyframes throb {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.6;
+            }
+        }
+
+        /* ── DESC ── */
+        .task-desc {
+            font-size: 0.875rem;
+            color: var(--ink-muted);
+            line-height: 1.65;
+            margin-bottom: 1.25rem;
+            word-break: break-word;
+        }
+
+        /* ── DIVIDER ── */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border) 30%, var(--border) 70%, transparent);
+            margin-bottom: 1.25rem;
+        }
+
+        /* ── DATE ROW ── */
+        .date-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .date-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 0.2rem;
+        }
+
+        .date-value {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(0.95rem, 3vw, 1.05rem);
+            color: var(--ink);
+            font-weight: 400;
+        }
+
+        .time-chip {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.72rem;
+            padding: 0.45rem 0.9rem;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            background: var(--cream);
+            color: var(--ink-muted);
+            white-space: nowrap;
+            animation: breathe 3s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        /* ── STATUS ── */
+        .status-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .status-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.3rem 0.8rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+
+        .status-inprogress {
+            background: #EBF3FF;
+            color: #3A6EBF;
+        }
+
+        .status-inprogress .status-dot {
+            background: #3A6EBF;
+            animation: pulse-dot 1.8s ease-in-out infinite;
+        }
+
+        .status-done {
+            background: var(--sage-light);
+            color: var(--sage);
+        }
+
+        .status-done .status-dot {
+            background: var(--sage);
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(0.7);
+            }
+        }
+
+        /* ── TAGS ── */
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            list-style: none;
+        }
+
+        .tag {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.67rem;
+            letter-spacing: 0.04em;
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            background: var(--cream);
+            border: 1px solid var(--border);
+            color: var(--ink-muted);
+            cursor: default;
+            transition: all 0.18s;
+        }
+
+        .tag:hover {
+            background: var(--ink);
+            color: var(--cream);
+            border-color: var(--ink);
+        }
+
+        /* ── FOOTER ── */
+        .card-footer {
+            padding: 0.875rem 1.5rem 1.25rem;
+            display: flex;
+            gap: 0.6rem;
+            justify-content: flex-end;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        @media (min-width: 480px) {
+            .card-footer {
+                padding: 1rem 2rem 1.5rem;
+            }
+        }
+
+        .btn {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 500;
+            padding: 0.55rem 1.1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--ink-muted);
+            cursor: pointer;
+            transition: all 0.18s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 36px;
+        }
+
+        /* Make buttons full-width on very small screens */
+        @media (max-width: 320px) {
+            .card-footer {
+                flex-direction: column;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+        }
+
+        .btn:hover {
+            background: var(--cream);
+            color: var(--ink);
+            border-color: var(--ink-faint);
+        }
+
+        .btn-danger {
+            border-color: rgba(200, 80, 42, 0.2);
+            color: var(--accent);
+        }
+
+        .btn-danger:hover {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ── CLOCK ── */
+        .clock-line {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.06em;
+        }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 22, 18, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--warm-white);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 440px;
+            margin: auto;
+            padding: clamp(1.25rem, 5vw, 2rem);
+            animation: pop-up 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes pop-up {
+            from {
+                opacity: 0;
+                transform: scale(0.92) translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.15rem, 4vw, 1.4rem);
+            color: var(--ink);
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--cream);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem;
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.18s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+        }
+
+        @media (min-width: 380px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-cancel,
+        .btn-save {
+            flex: 1;
+            min-width: 100px;
+            padding: 0.75rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+
+        .btn-cancel {
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--ink-muted);
+        }
+
+        .btn-cancel:hover {
+            background: var(--cream);
+        }
+
+        .btn-save {
+            font-weight: 600;
+            border: none;
+            background: var(--ink);
+            color: var(--cream);
+        }
+
+        .btn-save:hover {
+            background: var(--accent);
+        }
+
+        /* ── DELETED NOTICE ── */
+        .deleted-notice {
+            display: none;
+            text-align: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .deleted-notice.show {
+            display: block;
+        }
+
+        .deleted-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .deleted-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--ink-muted);
+            font-style: italic;
+        }
+
+        /* ── TOUCH TARGET BOOST ── */
+        @media (pointer: coarse) {
+            .btn {
+                min-height: 44px;
+                padding: 0.65rem 1.1rem;
+            }
+
+            .btn-cancel,
+            .btn-save {
+                min-height: 44px;
+            }
+
+            .checkbox-wrap input[type="checkbox"] {
+                width: 26px;
+                height: 26px;
+            }
+
+            .checkbox-wrap {
+                width: 26px;
+                height: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card-wrapper">
+
+        <article id="todo-card" data-testid="test-todo-card" class="card">
+            <div class="card-band"></div>
+            <div class="card-body">
+
+                <!-- Top Row -->
+                <div class="top-row">
+                    <div class="checkbox-wrap">
+                        <input type="checkbox" id="complete-toggle" data-testid="test-todo-complete-toggle">
+                    </div>
+
+                    <span id="todo-priority" data-testid="test-todo-priority" class="priority-pill"></span>
+                </div>
+
+                <div>
+                    <div class="title-area">
+                        <h3 id="todo-title" data-testid="test-todo-title" class="task-title"></h3>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <p id="todo-description" data-testid="test-todo-description" class="task-desc"></p>
+
+                <div class="divider"></div>
+
+                <!-- Date Row -->
+                <div class="date-row">
+                    <div>
+                        <div class="date-label">Due date</div>
+                        <time id="todo-due-date" data-testid="test-todo-due-date" class="date-value"></time>
+                    </div>
+                    <div id="todo-time-remaining" data-testid="test-todo-time-remaining" class="time-chip"></div>
+                </div>
+
+                <!-- Status -->
+                <div class="status-row">
+                    <span class="status-label">Status</span>
+                    <div id="todo-status" data-testid="test-todo-status" class="status-badge">
+                        <span id="status-dot" class="status-dot"></span>
+                        <span id="status-text"></span>
+                    </div>
+                </div>
+
+                <!-- Tags -->
+                <ul id="todo-tags" data-testid="test-todo-tags" class="tags-list"></ul>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="card-footer">
+                <button class="btn" onclick="editTask()" data-testid="test-todo-edit-button">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                    Edit
+                </button>
+                <button class="btn btn-danger" onclick="deleteTask()" data-testid="test-todo-delete-button">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14H6L5 6" />
+                        <path d="M10 11v6M14 11v6" />
+                        <path d="M9 6V4h6v2" />
+                    </svg>
+                    Delete
+                </button>
+            </div>
+        </article>
+
+        <div id="deleted-notice" class="deleted-notice">
+            <div class="deleted-icon">○</div>
+            <p class="deleted-text">Task removed. Refresh to restore.</p>
+        </div>
+
+        <p class="clock-line">Syncing every 30s &nbsp;·&nbsp; <span id="current-time"></span></p>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal-overlay" role="dialog">
+        <div class="modal">
+            <h3 class="modal-title">Edit task</h3>
+
+            <div class="form-group">
+                <label class="form-label">Title</label>
+                <input id="edit-title" type="text" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea id="edit-description" rows="3" class="form-textarea"></textarea>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Priority</label>
+                    <select id="edit-priority" class="form-select">
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Due date</label>
+                    <input id="edit-due-date" type="datetime-local" class="form-input">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Tags (comma separated)</label>
+                <input id="edit-tags" type="text" class="form-input">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-save" onclick="saveChanges()">Save changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let task = {
+            title: "Launch new product landing page",
+            description: "Finalise design assets, integrate analytics, prepare A/B tests, and coordinate with marketing for launch day.",
+            priority: "high",
+            dueDateISO: "2026-04-25T18:00:00",
+            completed: false,
+            tags: ["marketing", "launch", "design", "ui"]
+        };
+
+        let isDeleted = false;
+
+        const fmt = iso => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+        function timeRemaining(iso) {
+            const diff = new Date(iso) - new Date();
+            const abs = Math.abs(diff);
+            const days = Math.floor(abs / 864e5);
+            const hrs = Math.floor(abs / 36e5);
+            const mins = Math.floor(abs / 6e4);
+            const past = diff < 0;
+            if (days > 0) return past ? `${days}d overdue` : `${days}d remaining`;
+            if (hrs > 0) return past ? `${hrs}h overdue` : `${hrs}h remaining`;
+            if (mins > 0) return past ? `${mins}m overdue` : `${mins}m remaining`;
+            return past ? "Overdue" : "Due now";
+        }
+
+        function renderCard() {
+            if (isDeleted) return;
+            document.getElementById('todo-title').textContent = task.title;
+            document.getElementById('todo-description').textContent = task.description;
+            document.getElementById('todo-due-date').textContent = fmt(task.dueDateISO);
+            document.getElementById('todo-time-remaining').textContent = timeRemaining(task.dueDateISO);
+
+            const pEl = document.getElementById('todo-priority');
+            const cls = task.priority === 'high' ? 'prio-high' : task.priority === 'medium' ? 'prio-medium' : 'prio-low';
+            pEl.className = `priority-pill ${cls}`;
+            pEl.innerHTML = `<span class="priority-dot"></span>${task.priority.toUpperCase()}`;
+
+            const sEl = document.getElementById('todo-status');
+            const sdot = document.getElementById('status-dot');
+            const stxt = document.getElementById('status-text');
+            if (task.completed) {
+                sEl.className = 'status-badge status-done';
+                sdot.className = 'status-dot';
+                stxt.textContent = 'Completed';
+            } else {
+                sEl.className = 'status-badge status-inprogress';
+                sdot.className = 'status-dot';
+                stxt.textContent = 'In progress';
+            }
+
+            document.getElementById('complete-toggle').checked = task.completed;
+            document.getElementById('todo-card').classList.toggle('completed', task.completed);
+
+            const ul = document.getElementById('todo-tags');
+            ul.innerHTML = '';
+            task.tags.forEach(tag => {
+                const li = document.createElement('li');
+                li.setAttribute('data-testid', `test-todo-tag-${tag}`);
+                li.className = 'tag';
+                li.textContent = `#${tag}`;
+                ul.appendChild(li);
+            });
+        }
+
+        function editTask() {
+            document.getElementById('edit-title').value = task.title;
+            document.getElementById('edit-description').value = task.description;
+            document.getElementById('edit-priority').value = task.priority;
+            document.getElementById('edit-due-date').value = task.dueDateISO.slice(0, 16);
+            document.getElementById('edit-tags').value = task.tags.join(', ');
+            document.getElementById('edit-modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('edit-modal').classList.remove('open');
+        }
+
+        function saveChanges() {
+            task.title = document.getElementById('edit-title').value.trim() || task.title;
+            task.description = document.getElementById('edit-description').value.trim() || task.description;
+            task.priority = document.getElementById('edit-priority').value;
+            const d = document.getElementById('edit-due-date').value;
+            if (d) task.dueDateISO = d + ':00';
+            const raw = document.getElementById('edit-tags').value;
+            if (raw.trim()) task.tags = raw.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+            closeModal();
+            renderCard();
+        }
+
+        function deleteTask() {
+            if (!confirm("Remove this task?")) return;
+            isDeleted = true;
+            document.getElementById('todo-card').style.display = 'none';
+            document.getElementById('deleted-notice').classList.add('show');
+        }
+
+        document.getElementById('complete-toggle').addEventListener('change', e => {
+            task.completed = e.target.checked;
+            renderCard();
+        });
+
+        document.getElementById('edit-modal').addEventListener('click', e => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+        function tick() {
+            document.getElementById('current-time').textContent =
+                new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        tick();
+        setInterval(tick, 1000);
+        setInterval(() => { if (!isDeleted) renderCard(); }, 30000);
+        renderCard();
+    </script>
+</body>
+
+</html>
