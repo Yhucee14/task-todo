@@ -13,11 +13,11 @@ A clean, high-fidelity, fully interactive Task Card component built for a modern
 - Responsive and accessible
 
 ## Live Demo
-[View Live Demo](https://your-vercel-link.vercel.app)
+[View Live Demo](https://task-todo-seven-phi.vercel.app)
 
 ## How to Run Locally
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/taskly-todo-card.git
+git clone https://github.com/Yhucee14/task-todo.git
 cd taskly-todo-card
