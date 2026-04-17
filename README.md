@@ -60,7 +60,6 @@ A clean, high-fidelity, **fully interactive and stateful** single Todo Card comp
 
 ## Live Demo
 [View Live Demo](https://task-todo-seven-phi.vercel.app)  
-*(Update this link with your new deployed URL after deployment)*
 
 ## How to Run Locally
 
