@@ -63,7 +63,10 @@ A clean, high-fidelity, **fully interactive and stateful** single Todo Card comp
 
 ## How to Run Locally
 
-1. Clone the repository:
+ Clone the repository:
    ```bash
    git clone https://github.com/Yhucee14/task-todo.git
    cd taskly-todo-card
+   code .
+
+
