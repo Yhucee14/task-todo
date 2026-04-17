@@ -117,14 +117,6 @@
             margin-bottom: 1rem;
         }
 
-        .left-group {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.65rem;
-            flex: 1;
-            min-width: 0;
-        }
-
         .checkbox-wrap {
             margin-top: 3px;
             flex-shrink: 0;
@@ -243,13 +235,60 @@
             }
         }
 
-        /* ── DESC ── */
+        /* ── PRIORITY INDICATOR (new) ── */
+        .priority-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+            margin-top: 4px;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.85);
+        }
+
+        /* ── DESC & COLLAPSIBLE (new) ── */
+        .desc-wrapper {
+            margin-bottom: 1.25rem;
+        }
+
+        .collapsible-content {
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .collapsible-content:not(.expanded) {
+            max-height: 92px;
+        }
+
         .task-desc {
             font-size: 0.875rem;
             color: var(--ink-muted);
             line-height: 1.65;
-            margin-bottom: 1.25rem;
             word-break: break-word;
+        }
+
+        .expand-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent);
+            background: transparent;
+            border: none;
+            padding: 4px 0;
+            cursor: pointer;
+            width: fit-content;
+        }
+
+        .expand-btn .expand-text::after {
+            content: ' ▼';
+            font-size: 0.9em;
+        }
+
+        .expand-btn[aria-expanded="true"] .expand-text::after {
+            content: ' ▲';
         }
 
         /* ── DIVIDER ── */
@@ -297,6 +336,13 @@
             animation: breathe 3s ease-in-out infinite;
         }
 
+        .time-chip.overdue {
+            background: #fee2e2 !important;
+            color: var(--accent) !important;
+            border-color: var(--accent) !important;
+            animation: none;
+        }
+
         @keyframes breathe {
 
             0%,
@@ -307,6 +353,21 @@
             50% {
                 opacity: 0.7;
             }
+        }
+
+        /* ── OVERDUE INDICATOR (new) ── */
+        .overdue-badge {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            padding: 0.3rem 0.75rem;
+            border-radius: 100px;
+            background: #fee2e2;
+            color: var(--accent);
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 1px 2px rgba(200, 80, 42, 0.1);
         }
 
         /* ── STATUS ── */
@@ -324,6 +385,26 @@
             letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--ink-faint);
+        }
+
+        .status-control {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            padding: 0.35rem 1rem;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            background: var(--warm-white);
+            color: var(--ink);
+            cursor: pointer;
+            min-width: 140px;
+            transition: border-color 0.18s;
+        }
+
+        .status-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(200, 80, 42, 0.1);
         }
 
         .status-badge {
@@ -359,6 +440,15 @@
 
         .status-done .status-dot {
             background: var(--sage);
+        }
+
+        .status-pending {
+            background: var(--amber-light);
+            color: var(--amber);
+        }
+
+        .status-pending .status-dot {
+            background: var(--amber);
         }
 
         @keyframes pulse-dot {
@@ -435,7 +525,6 @@
             min-height: 36px;
         }
 
-        /* Make buttons full-width on very small screens */
         @media (max-width: 320px) {
             .card-footer {
                 flex-direction: column;
@@ -473,59 +562,12 @@
             letter-spacing: 0.06em;
         }
 
-        /* ── MODAL ── */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(26, 22, 18, 0.55);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 50;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            overflow-y: auto;
-        }
-
-        .modal-overlay.open {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--warm-white);
-            border-radius: 20px;
-            width: 100%;
-            max-width: 440px;
-            margin: auto;
-            padding: clamp(1.25rem, 5vw, 2rem);
-            animation: pop-up 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-        }
-
-        @keyframes pop-up {
-            from {
-                opacity: 0;
-                transform: scale(0.92) translateY(16px);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        .modal-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.15rem, 4vw, 1.4rem);
-            color: var(--ink);
-            margin-bottom: 1.25rem;
-        }
-
-        .form-group {
+        /* ── EDIT FORM (inline, replaces modal) ── */
+        .edit-form .form-group {
             margin-bottom: 1rem;
         }
 
-        .form-label {
+        .edit-form .form-label {
             display: block;
             font-family: 'DM Mono', monospace;
             font-size: 0.65rem;
@@ -535,9 +577,9 @@
             margin-bottom: 0.4rem;
         }
 
-        .form-input,
-        .form-select,
-        .form-textarea {
+        .edit-form .form-input,
+        .edit-form .form-select,
+        .edit-form .form-textarea {
             width: 100%;
             padding: 0.75rem 1rem;
             border: 1px solid var(--border);
@@ -550,30 +592,30 @@
             transition: border-color 0.18s;
         }
 
-        .form-input:focus,
-        .form-select:focus,
-        .form-textarea:focus {
+        .edit-form .form-input:focus,
+        .edit-form .form-select:focus,
+        .edit-form .form-textarea:focus {
             border-color: var(--accent);
         }
 
-        .form-textarea {
+        .edit-form .form-textarea {
             resize: vertical;
             min-height: 80px;
         }
 
-        .form-grid {
+        .edit-form .form-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 0.8rem;
         }
 
         @media (min-width: 380px) {
-            .form-grid {
+            .edit-form .form-grid {
                 grid-template-columns: 1fr 1fr;
             }
         }
 
-        .modal-actions {
+        .edit-form .modal-actions {
             display: flex;
             gap: 0.6rem;
             margin-top: 1.25rem;
@@ -670,52 +712,105 @@
             <div class="card-band"></div>
             <div class="card-body">
 
-                <!-- Top Row -->
-                <div class="top-row">
-                    <div class="checkbox-wrap">
-                        <input type="checkbox" id="complete-toggle" data-testid="test-todo-complete-toggle">
+                <!-- VIEW SECTION (Stage 0 content + new enhancements) -->
+                <div id="view-section">
+
+                    <!-- Top Row -->
+                    <div class="top-row">
+                        <div class="checkbox-wrap">
+                            <input type="checkbox" id="complete-toggle" data-testid="test-todo-complete-toggle">
+                        </div>
+                        <!-- New: Priority visual indicator (colored dot) -->
+                        <span id="todo-priority-indicator" data-testid="test-todo-priority-indicator" class="priority-indicator"></span>
+                        <span id="todo-priority" data-testid="test-todo-priority" class="priority-pill"></span>
                     </div>
 
-                    <span id="todo-priority" data-testid="test-todo-priority" class="priority-pill"></span>
-                </div>
-
-                <div>
-                    <div class="title-area">
-                        <h3 id="todo-title" data-testid="test-todo-title" class="task-title"></h3>
-                    </div>
-                </div>
-
-                <!-- Description -->
-                <p id="todo-description" data-testid="test-todo-description" class="task-desc"></p>
-
-                <div class="divider"></div>
-
-                <!-- Date Row -->
-                <div class="date-row">
                     <div>
-                        <div class="date-label">Due date</div>
-                        <time id="todo-due-date" data-testid="test-todo-due-date" class="date-value"></time>
+                        <div class="title-area">
+                            <h3 id="todo-title" data-testid="test-todo-title" class="task-title"></h3>
+                        </div>
                     </div>
-                    <div id="todo-time-remaining" data-testid="test-todo-time-remaining" class="time-chip"></div>
+
+                    <!-- Description with expand/collapse -->
+                    <div class="desc-wrapper">
+                        <div id="todo-collapsible-section" data-testid="test-todo-collapsible-section" class="collapsible-content">
+                            <p id="todo-description" data-testid="test-todo-description" class="task-desc"></p>
+                        </div>
+                        <button type="button" id="todo-expand-toggle" data-testid="test-todo-expand-toggle"
+                                class="expand-btn" aria-expanded="false" aria-controls="todo-collapsible-section">
+                            <span class="expand-text">Show more</span>
+                        </button>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Date Row -->
+                    <div class="date-row">
+                        <div>
+                            <div class="date-label">Due date</div>
+                            <time id="todo-due-date" data-testid="test-todo-due-date" class="date-value"></time>
+                        </div>
+                        <div id="todo-time-remaining" data-testid="test-todo-time-remaining" class="time-chip" aria-live="polite"></div>
+                        <!-- New: Overdue indicator -->
+                        <div id="todo-overdue-indicator" data-testid="test-todo-overdue-indicator" class="overdue-badge" style="display: none;"></div>
+                    </div>
+
+                    <!-- Status with new control + legacy display badge -->
+                    <div class="status-row">
+                        <label for="todo-status-control" class="status-label">Status</label>
+                        <!-- New: Status control (dropdown) -->
+                        <select id="todo-status-control" data-testid="test-todo-status-control" class="status-control">
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Done">Done</option>
+                        </select>
+                        <div id="todo-status" data-testid="test-todo-status" class="status-badge">
+                            <span id="status-dot" class="status-dot"></span>
+                            <span id="status-text"></span>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <ul id="todo-tags" data-testid="test-todo-tags" class="tags-list"></ul>
+
                 </div>
 
-                <!-- Status -->
-                <div class="status-row">
-                    <span class="status-label">Status</span>
-                    <div id="todo-status" data-testid="test-todo-status" class="status-badge">
-                        <span id="status-dot" class="status-dot"></span>
-                        <span id="status-text"></span>
+                <!-- EDIT FORM (new inline edit mode) -->
+                <div id="todo-edit-form" data-testid="test-todo-edit-form" class="edit-form" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label" for="edit-title-input">Title</label>
+                        <input id="edit-title-input" type="text" class="form-input" data-testid="test-todo-edit-title-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="edit-description-input">Description</label>
+                        <textarea id="edit-description-input" rows="4" class="form-textarea" data-testid="test-todo-edit-description-input"></textarea>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="edit-priority-select">Priority</label>
+                            <select id="edit-priority-select" class="form-select" data-testid="test-todo-edit-priority-select">
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="edit-due-date-input">Due date</label>
+                            <input id="edit-due-date-input" type="datetime-local" class="form-input" data-testid="test-todo-edit-due-date-input">
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button class="btn-cancel" data-testid="test-todo-cancel-button" onclick="cancelEdit()">Cancel</button>
+                        <button class="btn-save" data-testid="test-todo-save-button" onclick="saveEdit()">Save changes</button>
                     </div>
                 </div>
-
-                <!-- Tags -->
-                <ul id="todo-tags" data-testid="test-todo-tags" class="tags-list"></ul>
 
             </div>
 
-            <!-- Footer -->
+            <!-- Footer (Stage 0 buttons – hidden during edit mode) -->
             <div class="card-footer">
-                <button class="btn" onclick="editTask()" data-testid="test-todo-edit-button">
+                <button class="btn" onclick="enterEditMode()" data-testid="test-todo-edit-button">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -742,52 +837,13 @@
         <p class="clock-line">Syncing every 30s &nbsp;·&nbsp; <span id="current-time"></span></p>
     </div>
 
-    <!-- Edit Modal -->
-    <div id="edit-modal" class="modal-overlay" role="dialog">
-        <div class="modal">
-            <h3 class="modal-title">Edit task</h3>
-
-            <div class="form-group">
-                <label class="form-label">Title</label>
-                <input id="edit-title" type="text" class="form-input">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Description</label>
-                <textarea id="edit-description" rows="3" class="form-textarea"></textarea>
-            </div>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label">Priority</label>
-                    <select id="edit-priority" class="form-select">
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Due date</label>
-                    <input id="edit-due-date" type="datetime-local" class="form-input">
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Tags (comma separated)</label>
-                <input id="edit-tags" type="text" class="form-input">
-            </div>
-
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn-save" onclick="saveChanges()">Save changes</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         let task = {
             title: "Launch new product landing page",
             description: "Finalise design assets, integrate analytics, prepare A/B tests, and coordinate with marketing for launch day.",
             priority: "high",
             dueDateISO: "2026-04-25T18:00:00",
-            completed: false,
+            status: "In Progress",
             tags: ["marketing", "launch", "design", "ui"]
         };
 
@@ -796,46 +852,121 @@
         const fmt = iso => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
         function timeRemaining(iso) {
-            const diff = new Date(iso) - new Date();
-            const abs = Math.abs(diff);
-            const days = Math.floor(abs / 864e5);
-            const hrs = Math.floor(abs / 36e5);
-            const mins = Math.floor(abs / 6e4);
-            const past = diff < 0;
-            if (days > 0) return past ? `${days}d overdue` : `${days}d remaining`;
-            if (hrs > 0) return past ? `${hrs}h overdue` : `${hrs}h remaining`;
-            if (mins > 0) return past ? `${mins}m overdue` : `${mins}m remaining`;
-            return past ? "Overdue" : "Due now";
+            const due = new Date(iso);
+            const now = new Date();
+            let diff = due - now;
+            const isPast = diff < 0;
+
+            if (task.status === "Done") {
+                return "Completed";
+            }
+
+            const absDiff = Math.abs(diff);
+            const days = Math.floor(absDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((absDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((absDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+            if (isPast) {
+                if (days >= 1) return `Overdue by ${days}d`;
+                if (hours >= 1) return `Overdue by ${hours}h`;
+                if (minutes >= 1) return `Overdue by ${minutes}m`;
+                return "Overdue";
+            } else {
+                if (days >= 2) return `Due in ${days} days`;
+                if (days === 1) return `Due in 1 day`;
+                if (hours >= 1) return `Due in ${hours} hours`;
+                if (minutes >= 1) return `Due in ${minutes} minutes`;
+                return "Due now";
+            }
         }
 
         function renderCard() {
             if (isDeleted) return;
-            document.getElementById('todo-title').textContent = task.title;
-            document.getElementById('todo-description').textContent = task.description;
-            document.getElementById('todo-due-date').textContent = fmt(task.dueDateISO);
-            document.getElementById('todo-time-remaining').textContent = timeRemaining(task.dueDateISO);
 
+            // Title
+            document.getElementById('todo-title').textContent = task.title;
+
+            // Description
+            const descEl = document.getElementById('todo-description');
+            descEl.textContent = task.description;
+
+            // Due date
+            document.getElementById('todo-due-date').textContent = fmt(task.dueDateISO);
+
+            // Time remaining (dynamic + "Completed" when done)
+            const timeEl = document.getElementById('todo-time-remaining');
+            timeEl.textContent = timeRemaining(task.dueDateISO);
+
+            // Priority pill (Stage 0)
             const pEl = document.getElementById('todo-priority');
             const cls = task.priority === 'high' ? 'prio-high' : task.priority === 'medium' ? 'prio-medium' : 'prio-low';
             pEl.className = `priority-pill ${cls}`;
             pEl.innerHTML = `<span class="priority-dot"></span>${task.priority.toUpperCase()}`;
 
+            // New: Priority indicator (colored dot)
+            const prioInd = document.getElementById('todo-priority-indicator');
+            prioInd.style.backgroundColor = task.priority === 'high' 
+                ? 'var(--accent)' 
+                : task.priority === 'medium' 
+                    ? 'var(--amber)' 
+                    : 'var(--sage)';
+
+            // Status control + badge (synced)
+            const statusControl = document.getElementById('todo-status-control');
+            statusControl.value = task.status;
+
             const sEl = document.getElementById('todo-status');
             const sdot = document.getElementById('status-dot');
             const stxt = document.getElementById('status-text');
-            if (task.completed) {
-                sEl.className = 'status-badge status-done';
-                sdot.className = 'status-dot';
-                stxt.textContent = 'Completed';
+
+            let badgeCls = '';
+            let dotBg = '';
+            switch (task.status) {
+                case 'Done':
+                    badgeCls = 'status-done';
+                    dotBg = 'var(--sage)';
+                    break;
+                case 'In Progress':
+                    badgeCls = 'status-inprogress';
+                    dotBg = '#3A6EBF';
+                    break;
+                case 'Pending':
+                    badgeCls = 'status-pending';
+                    dotBg = 'var(--amber)';
+                    break;
+            }
+            sEl.className = `status-badge ${badgeCls}`;
+            sdot.style.backgroundColor = dotBg;
+            stxt.textContent = task.status;
+
+            // Checkbox ↔ status sync
+            document.getElementById('complete-toggle').checked = task.status === 'Done';
+            document.getElementById('todo-card').classList.toggle('completed', task.status === 'Done');
+
+            // Overdue logic
+            const due = new Date(task.dueDateISO);
+            const now = new Date();
+            const isOverdueNow = due < now && task.status !== "Done";
+            const overdueEl = document.getElementById('todo-overdue-indicator');
+            overdueEl.style.display = isOverdueNow ? 'inline-flex' : 'none';
+            if (isOverdueNow) overdueEl.textContent = 'Overdue';
+            timeEl.classList.toggle('overdue', isOverdueNow);
+
+            // Expand/collapse logic (default collapsed if long)
+            const collapsibleEl = document.getElementById('todo-collapsible-section');
+            const toggleBtn = document.getElementById('todo-expand-toggle');
+            const isLong = task.description.length > 110;
+            if (isLong) {
+                collapsibleEl.classList.remove('expanded');
+                toggleBtn.style.display = 'flex';
+                toggleBtn.setAttribute('aria-expanded', 'false');
+                toggleBtn.querySelector('.expand-text').textContent = 'Show more';
             } else {
-                sEl.className = 'status-badge status-inprogress';
-                sdot.className = 'status-dot';
-                stxt.textContent = 'In progress';
+                collapsibleEl.classList.add('expanded');
+                toggleBtn.style.display = 'none';
             }
 
-            document.getElementById('complete-toggle').checked = task.completed;
-            document.getElementById('todo-card').classList.toggle('completed', task.completed);
-
+            // Tags
             const ul = document.getElementById('todo-tags');
             ul.innerHTML = '';
             task.tags.forEach(tag => {
@@ -847,28 +978,48 @@
             });
         }
 
-        function editTask() {
-            document.getElementById('edit-title').value = task.title;
-            document.getElementById('edit-description').value = task.description;
-            document.getElementById('edit-priority').value = task.priority;
-            document.getElementById('edit-due-date').value = task.dueDateISO.slice(0, 16);
-            document.getElementById('edit-tags').value = task.tags.join(', ');
-            document.getElementById('edit-modal').classList.add('open');
+        function enterEditMode() {
+            const viewSection = document.getElementById('view-section');
+            const editForm = document.getElementById('todo-edit-form');
+
+            viewSection.style.display = 'none';
+            editForm.style.display = 'block';
+
+            // Populate edit form
+            document.getElementById('edit-title-input').value = task.title;
+            document.getElementById('edit-description-input').value = task.description;
+            document.getElementById('edit-priority-select').value = task.priority;
+            const dueVal = task.dueDateISO ? task.dueDateISO.substring(0, 16) : '';
+            document.getElementById('edit-due-date-input').value = dueVal;
+
+            // Hide footer buttons while editing
+            document.querySelectorAll('.card-footer .btn').forEach(btn => {
+                btn.style.display = 'none';
+            });
         }
 
-        function closeModal() {
-            document.getElementById('edit-modal').classList.remove('open');
+        function cancelEdit() {
+            const viewSection = document.getElementById('view-section');
+            const editForm = document.getElementById('todo-edit-form');
+
+            viewSection.style.display = 'block';
+            editForm.style.display = 'none';
+
+            // Restore footer buttons
+            document.querySelectorAll('.card-footer .btn').forEach(btn => {
+                btn.style.display = '';
+            });
         }
 
-        function saveChanges() {
-            task.title = document.getElementById('edit-title').value.trim() || task.title;
-            task.description = document.getElementById('edit-description').value.trim() || task.description;
-            task.priority = document.getElementById('edit-priority').value;
-            const d = document.getElementById('edit-due-date').value;
-            if (d) task.dueDateISO = d + ':00';
-            const raw = document.getElementById('edit-tags').value;
-            if (raw.trim()) task.tags = raw.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
-            closeModal();
+        function saveEdit() {
+            task.title = document.getElementById('edit-title-input').value.trim() || task.title;
+            task.description = document.getElementById('edit-description-input').value.trim() || task.description;
+            task.priority = document.getElementById('edit-priority-select').value;
+
+            const dueVal = document.getElementById('edit-due-date-input').value;
+            if (dueVal) task.dueDateISO = dueVal + ':00';
+
+            cancelEdit();
             renderCard();
         }
 
@@ -879,24 +1030,50 @@
             document.getElementById('deleted-notice').classList.add('show');
         }
 
-        document.getElementById('complete-toggle').addEventListener('change', e => {
-            task.completed = e.target.checked;
-            renderCard();
-        });
+        // Initialize all interactive listeners
+        function initListeners() {
+            // Checkbox ↔ status sync
+            document.getElementById('complete-toggle').addEventListener('change', e => {
+                task.status = e.target.checked ? "Done" : "Pending";
+                renderCard();
+            });
 
-        document.getElementById('edit-modal').addEventListener('click', e => {
-            if (e.target === e.currentTarget) closeModal();
-        });
+            // Status control (dropdown)
+            const statusControl = document.getElementById('todo-status-control');
+            statusControl.addEventListener('change', e => {
+                task.status = e.target.value;
+                renderCard();
+            });
 
+            // Expand/collapse toggle (keyboard + aria accessible)
+            const expandToggle = document.getElementById('todo-expand-toggle');
+            if (expandToggle) {
+                expandToggle.addEventListener('click', function () {
+                    const collapsible = document.getElementById('todo-collapsible-section');
+                    const currentlyExpanded = collapsible.classList.contains('expanded');
+                    collapsible.classList.toggle('expanded', !currentlyExpanded);
+                    this.setAttribute('aria-expanded', !currentlyExpanded);
+                    const textEl = this.querySelector('.expand-text');
+                    if (textEl) textEl.textContent = !currentlyExpanded ? 'Show less' : 'Show more';
+                });
+            }
+        }
+
+        // Clock
         function tick() {
             document.getElementById('current-time').textContent =
                 new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         }
 
-        tick();
-        setInterval(tick, 1000);
-        setInterval(() => { if (!isDeleted) renderCard(); }, 30000);
-        renderCard();
+        // Boot
+        window.onload = function () {
+            initListeners();
+            tick();
+            setInterval(tick, 1000);
+            // Re-render every 30s for live time/overdue updates
+            setInterval(() => { if (!isDeleted) renderCard(); }, 30000);
+            renderCard();
+        };
     </script>
 </body>
 
